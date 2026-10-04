@@ -10,6 +10,20 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="GymLog"/>
   <link rel="manifest" href="manifest.webmanifest"/>
+  <script>
+    // En móvil con "Sitio de escritorio" activado el navegador ignora el viewport y
+    // pinta la página a ~980px (todo diminuto). Si pasa eso, escalamos al ancho real.
+    (function(){
+      var de=document.documentElement;
+      function fit(){
+        de.style.zoom='';
+        var touch=navigator.maxTouchPoints>0||'ontouchstart' in window;
+        var sw=window.screen&&screen.width;
+        if(touch&&sw&&innerWidth>sw*1.25)de.style.zoom=(innerWidth/sw).toFixed(3);
+      }
+      fit();addEventListener('resize',fit);addEventListener('orientationchange',fit);
+    })();
+  </script>
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
