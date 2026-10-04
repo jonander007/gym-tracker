@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.GymLog" parent="android:Theme.Translucent.NoTitleBar">
+        <item name="android:statusBarColor">@color/background</item>
+    </style>
+</resources>

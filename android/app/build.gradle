@@ -1,0 +1,53 @@
+plugins {
+    id 'com.android.application'
+}
+
+// URL de la web publicada en GitHub Pages
+def host = 'jonander007.github.io'
+def launchUrl = "https://${host}/gym-tracker/"
+
+android {
+    namespace 'io.github.jonander007.gymlog'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'io.github.jonander007.gymlog'
+        minSdk 21
+        targetSdk 34
+        versionCode Integer.parseInt(System.getenv('VERSION_CODE') ?: '1')
+        versionName System.getenv('VERSION_NAME') ?: '1.0'
+
+        resValue 'string', 'hostName', host
+        resValue 'string', 'launchUrl', launchUrl
+        resValue 'string', 'asset_statements',
+            "[{ \"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://${host}\"} }]"
+    }
+
+    signingConfigs {
+        release {
+            def ks = System.getenv('KEYSTORE_FILE')
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig System.getenv('KEYSTORE_FILE') ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}
