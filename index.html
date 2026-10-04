@@ -2,14 +2,38 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
   <title>GymLog</title>
+  <meta name="theme-color" content="#0c0c0f"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="GymLog"/>
+  <link rel="manifest" href="manifest.webmanifest"/>
+  <script>
+    // En móvil con "Sitio de escritorio" activado el navegador ignora el viewport y
+    // pinta la página a ~980px (todo diminuto). Si pasa eso, escalamos al ancho real.
+    (function(){
+      var de=document.documentElement;
+      function fit(){
+        de.style.zoom='';
+        var touch=navigator.maxTouchPoints>0||'ontouchstart' in window;
+        var sw=window.screen&&screen.width;
+        if(touch&&sw&&innerWidth>sw*1.25)de.style.zoom=(innerWidth/sw).toFixed(3);
+      }
+      fit();addEventListener('resize',fit);addEventListener('orientationchange',fit);
+    })();
+  </script>
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root{--bg:#0c0c0f;--s1:#13131a;--s2:#1a1a24;--s3:#22222e;--border:#2e2e3e;--accent:#00f5a0;--accent-dim:rgba(0,245,160,0.12);--red:#ff3d57;--text:#eeeef5;--muted:#5a5a7a;--r:14px}
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;max-width:480px;margin:0 auto;overflow-x:hidden}
+    html{background:var(--bg);-webkit-text-size-adjust:100%}
+    body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;min-height:100dvh;max-width:480px;margin:0 auto;overflow-x:hidden;overscroll-behavior-y:none;padding-bottom:env(safe-area-inset-bottom)}
+    button,.tab,.muscle-chip,.muscle-nav-btn{touch-action:manipulation;user-select:none;-webkit-user-select:none}
     #loading{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999}
     .load-logo{font-family:'Barlow Condensed',sans-serif;font-size:64px;font-weight:800;letter-spacing:6px;color:var(--accent);animation:breathe 1.8s ease-in-out infinite}
     @keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.97)}}
@@ -21,11 +45,11 @@
     .btn-google:hover{transform:translateY(-2px)}.btn-google:active{transform:scale(.97)}
     .btn-google svg{width:20px;height:20px;flex-shrink:0}
     #app{display:none;flex-direction:column;min-height:100vh}
-    .hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(12,12,15,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+    .hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;padding-top:calc(14px + env(safe-area-inset-top));background:rgba(12,12,15,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
     .hdr-logo{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;letter-spacing:3px;color:var(--accent)}
     .avatar{width:34px;height:34px;border-radius:50%;border:2px solid var(--accent);object-fit:cover;cursor:pointer;transition:opacity .2s}
     .avatar:hover{opacity:.8}
-    .tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--s1);border-bottom:1px solid var(--border);position:sticky;top:63px;z-index:99}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--s1);border-bottom:1px solid var(--border);position:sticky;top:calc(63px + env(safe-area-inset-top));z-index:99}
     .tab{padding:14px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;background:transparent;transition:all .2s;border-bottom:3px solid transparent}
     .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
     .page{padding:0 0 100px;display:none}.page.active{display:block}
@@ -171,7 +195,7 @@
     @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
     .modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
     .modal-title{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;letter-spacing:2px;margin-bottom:18px}
-    .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--s2);border:1px solid var(--border);border-radius:100px;padding:11px 20px;font-size:14px;font-weight:600;z-index:999;transition:transform .28s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none}
+    .toast{position:fixed;top:calc(16px + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-80px);background:var(--s2);border:1px solid var(--border);border-radius:100px;padding:11px 20px;font-size:14px;font-weight:600;z-index:999;transition:transform .28s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none}
     .toast.show{transform:translateX(-50%) translateY(0)}.toast.ok{border-color:var(--accent);color:var(--accent)}.toast.err{border-color:var(--red);color:var(--red)}
     .divider{height:1px;background:var(--border);margin:16px 0}
     .hidden{display:none!important}
@@ -347,7 +371,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, deleteDoc, doc, query, orderBy, onSnapshot }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -361,7 +385,14 @@ let fechaListLimit=5;
 let histTab='fecha';
 
 // ── AUTH ──
-document.getElementById('btn-login').onclick=async()=>{try{await signInWithPopup(auth,gprov);}catch(e){toast('Error al iniciar sesión','err');}};
+document.getElementById('btn-login').onclick=async()=>{
+  try{await signInWithPopup(auth,gprov);}
+  catch(e){
+    if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request')return;
+    if(e.code==='auth/popup-blocked'){try{await signInWithRedirect(auth,gprov);return;}catch(_){}}
+    toast(e.code==='auth/unauthorized-domain'?'Dominio no autorizado en Firebase':'Error al iniciar sesión','err');
+  }
+};
 document.getElementById('avatar').onclick=async()=>{if(confirm('¿Cerrar sesión?')){unsubs.forEach(u=>u());await signOut(auth);}};
 onAuthStateChanged(auth,user=>{
   document.getElementById('loading').style.display='none';
@@ -751,6 +782,9 @@ function shortDate(str){
   return`${d}/${m}/${y.slice(2)}`;
 }
 document.querySelectorAll('.overlay').forEach(ov=>{ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open');});});
+
+// ── PWA ──
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 </body>
 </html>
