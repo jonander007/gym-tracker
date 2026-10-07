@@ -1,6 +1,6 @@
 // Service worker: cachea la app para que abra rápido y funcione sin conexión.
 // Los datos van por Firestore (que tiene su propia caché), aquí solo el "cascarón".
-const CACHE = 'gymlog-v1';
+const CACHE = 'gymlog-v3';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
